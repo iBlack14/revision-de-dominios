@@ -5,6 +5,7 @@ import { getBrowser } from "./browser.js";
 import { pool } from "./db.js";
 import { eventHub } from "./events.js";
 import { sendStateAlert } from "./notifications.js";
+import { presentRun } from "./presenters.js";
 import { assertSafeUrl } from "./security.js";
 import { ensureScreenshotDirectory, screenshotPath } from "./screenshots.js";
 import type { ClientRecord, MonitorRecord, RunRecord } from "./types.js";
@@ -151,7 +152,7 @@ export async function runMonitor(monitor: MonitorRecord): Promise<RunRecord> {
   eventHub.publish(monitor.client_id, "monitor.checked", {
     monitor_id: monitor.id,
     status: nextStatus,
-    run
+    run: presentRun(run)
   });
 
   const clientResult = await pool.query<ClientRecord>(

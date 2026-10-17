@@ -75,6 +75,8 @@ curl -X POST http://127.0.0.1:8080/v1/monitors \
 
 ## Endpoints principales
 
+Para integraciones PHP y Laravel consulta `docs/API_PHP.md`. También se incluye un cliente reutilizable sin dependencias en `examples/php/WebWatchClient.php`.
+
 | Método | Ruta | Uso |
 | --- | --- | --- |
 | `GET` | `/health` | Salud del servicio |
@@ -109,6 +111,8 @@ X-WebWatch-Signature: sha256=...
 Calcula el HMAC sobre el cuerpo sin modificar usando el `webhook_secret` entregado al crear el cliente.
 
 ## Despliegue en VPS
+
+Para EasyPanel, sigue la guía específica en `DEPLOY_EASYPANEL.md`.
 
 1. Instala Docker Engine y Docker Compose.
 2. Apunta un dominio al VPS.

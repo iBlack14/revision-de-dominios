@@ -12,7 +12,7 @@ const schema = z.object({
   DATABASE_URL: z.string().min(1),
   ADMIN_TOKEN: z.string().min(16),
   SCREENSHOT_SIGNING_SECRET: z.string().min(16),
-  PUBLIC_BASE_URL: z.string().url().default("http://localhost:8080"),
+  PUBLIC_BASE_URL: z.string().url().default("http://localhost:8080").transform((value) => value.replace(/\/+$/, "")),
   SCREENSHOT_DIR: z.string().default("./data/screenshots"),
   CHECK_CONCURRENCY: z.coerce.number().int().min(1).max(20).default(2),
   MAX_MONITORS_PER_CLIENT: z.coerce.number().int().min(1).max(1000).default(50),

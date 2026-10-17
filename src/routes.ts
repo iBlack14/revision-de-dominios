@@ -7,6 +7,7 @@ import { authenticate, createApiKey, hashApiKey } from "./auth.js";
 import { config } from "./config.js";
 import { pool } from "./db.js";
 import { eventHub } from "./events.js";
+import { presentRun } from "./presenters.js";
 import { runMonitor } from "./runner.js";
 import { assertSafeUrl, isValidWebhookUrl } from "./security.js";
 import { verifyScreenshotSignature } from "./screenshots.js";
@@ -227,7 +228,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
       const monitor = await ownedMonitor(request.clientAccount!.id, id);
       if (!monitor) return reply.code(404).send({ error: "Monitor no encontrado" });
       const run = await runMonitor(monitor);
-      return reply.code(201).send(run);
+      return reply.code(201).send(presentRun(run));
     });
 
     secured.get("/monitors/:id/runs", async (request, reply) => {
@@ -240,7 +241,7 @@ export async function registerRoutes(app: FastifyInstance): Promise<void> {
         "SELECT * FROM runs WHERE monitor_id = $1 AND client_id = $2 ORDER BY created_at DESC LIMIT $3",
         [id, request.clientAccount!.id, limit]
       );
-      return { data: result.rows };
+      return { data: result.rows.map(presentRun) };
     });
 
     secured.get("/runs/:id/screenshot", async (request, reply) => {
