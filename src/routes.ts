@@ -58,6 +58,13 @@ async function ownedMonitor(clientId: string, monitorId: string): Promise<Monito
 }
 
 export async function registerRoutes(app: FastifyInstance): Promise<void> {
+  app.get("/", async () => ({
+    name: "WebWatch API",
+    status: "ok",
+    health: "/health",
+    documentation: "/docs"
+  }));
+
   app.get("/health", async () => {
     await pool.query("SELECT 1");
     return { status: "ok", time: new Date().toISOString() };
