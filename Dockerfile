@@ -1,4 +1,15 @@
-FROM node:22-bookworm-slim
+FROM node:22-bookworm-slim AS build
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --include=dev
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
+FROM node:22-bookworm-slim AS runtime
 
 ENV NODE_ENV=production \
     PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
@@ -6,12 +17,12 @@ ENV NODE_ENV=production \
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci && npx playwright install --with-deps chromium
+RUN npm ci --omit=dev \
+    && npx playwright install --with-deps chromium \
+    && npm cache clean --force
 
-COPY tsconfig.json ./
-COPY src ./src
+COPY --from=build /app/dist ./dist
 COPY migrations ./migrations
-RUN npm run build && npm prune --omit=dev
 
 RUN useradd --create-home --uid 10001 webwatch \
     && mkdir -p /data/screenshots \

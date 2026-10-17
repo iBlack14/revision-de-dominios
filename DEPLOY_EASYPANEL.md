@@ -217,6 +217,10 @@ Si usas GitHub:
 
 El VPS o Docker Builder se quedó sin memoria durante la instalación de Chromium. Aumenta RAM/swap o los límites del builder y ejecuta **Force Rebuild**.
 
+### El build muestra `tsc: not found`
+
+Confirma que el repositorio contiene el Dockerfile multietapa actual. La etapa `build` instala dependencias de desarrollo con `npm ci --include=dev`; la etapa final instala únicamente las dependencias de producción. Después ejecuta **Force Rebuild** para evitar una capa antigua de `npm ci` guardada en caché.
+
 ### La aplicación no conecta a PostgreSQL
 
 - Usa la Internal Connection URL, no `localhost`.
@@ -240,4 +244,3 @@ El VPS o Docker Builder se quedó sin memoria durante la instalación de Chromiu
 - Baja `CHECK_CONCURRENCY` a `1`.
 - Aumenta el intervalo de los monitores.
 - Sube el límite de memoria del servicio.
-
