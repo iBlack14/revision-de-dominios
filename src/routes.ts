@@ -13,13 +13,13 @@ import { verifyScreenshotSignature } from "./screenshots.js";
 import type { MonitorRecord, RunRecord } from "./types.js";
 
 const clientSchema = z.object({
-  name: z.string().trim().min(2).max(100),
+  name: z.string().trim().min(2).max(100).regex(/^[^\r\n]+$/),
   alert_email: z.email().nullable().optional(),
   webhook_url: z.url().nullable().optional()
 });
 
 const monitorSchema = z.object({
-  name: z.string().trim().min(2).max(120),
+  name: z.string().trim().min(2).max(120).regex(/^[^\r\n]+$/),
   url: z.url(),
   interval_seconds: z.number().int().min(30).max(86400).default(300),
   timeout_ms: z.number().int().min(1000).max(60000).default(30000),

@@ -30,7 +30,8 @@ await app.register(swaggerUi, { routePrefix: "/docs" });
 
 app.setErrorHandler((error: FastifyError, _request, reply) => {
   app.log.error(error);
-  const statusCode = error.statusCode && error.statusCode < 500 ? error.statusCode : 500;
+  const candidateStatus = (error as FastifyError & { statusCode?: number }).statusCode;
+  const statusCode = candidateStatus && candidateStatus < 500 ? candidateStatus : 500;
   reply.code(statusCode).send({
     error: statusCode === 500 ? "Error interno" : error.message
   });

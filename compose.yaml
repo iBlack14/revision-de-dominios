@@ -19,7 +19,9 @@ services:
   api:
     build: .
     restart: unless-stopped
-    env_file: .env
+    env_file:
+      - path: .env
+        required: false
     environment:
       NODE_ENV: production
       DATABASE_URL: postgres://webwatch:${POSTGRES_PASSWORD:-webwatch-local-password}@postgres:5432/webwatch

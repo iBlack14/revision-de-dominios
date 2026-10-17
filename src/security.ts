@@ -4,6 +4,10 @@ import { config } from "./config.js";
 
 const blockedHostnames = new Set(["localhost", "localhost.localdomain"]);
 
+export class UnsafeUrlError extends Error {
+  readonly statusCode = 400;
+}
+
 function isPublicAddress(address: string): boolean {
   const parsed = ipaddr.parse(address);
   const range = parsed.range();
@@ -15,23 +19,25 @@ export async function assertSafeUrl(value: string): Promise<URL> {
   try {
     url = new URL(value);
   } catch {
-    throw new Error("URL inválida");
+    throw new UnsafeUrlError("URL inválida");
   }
 
   if (!['http:', 'https:'].includes(url.protocol)) {
-    throw new Error("Solo se permiten URLs HTTP o HTTPS");
+    throw new UnsafeUrlError("Solo se permiten URLs HTTP o HTTPS");
   }
   if (url.username || url.password) {
-    throw new Error("No se permiten credenciales dentro de la URL");
+    throw new UnsafeUrlError("No se permiten credenciales dentro de la URL");
   }
   if (config.ALLOW_PRIVATE_TARGETS) return url;
   if (blockedHostnames.has(url.hostname.toLowerCase())) {
-    throw new Error("No se permiten destinos locales");
+    throw new UnsafeUrlError("No se permiten destinos locales");
   }
 
-  const addresses = await lookup(url.hostname, { all: true, verbatim: true });
+  const addresses = await lookup(url.hostname, { all: true, verbatim: true }).catch(() => {
+    throw new UnsafeUrlError("No se pudo resolver el dominio");
+  });
   if (!addresses.length || addresses.some(({ address }) => !isPublicAddress(address))) {
-    throw new Error("El destino resuelve a una red privada o reservada");
+    throw new UnsafeUrlError("El destino resuelve a una red privada o reservada");
   }
   return url;
 }
